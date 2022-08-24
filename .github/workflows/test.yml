@@ -1,16 +1,22 @@
 name: Tests
-on: [push, pull_request]
+on: 
+  push:
+    branches: ["master"]
+  
+  pull_request:
+    branches: ["master"]
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: 3.x
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
-          node-version: 12
+          node-version: 16
       - uses: actions/cache@v2
         with:
           path: ~/.cache/pip
@@ -20,10 +26,8 @@ jobs:
         with:
           path: ~/.npm
           key: v1/${{ runner.os }}/node-12/${{ hashFiles('**/package-lock.lock') }}
-          restore-keys: v1/${{ runner.os }}/node-12/
+          restore-keys: v1/${{ runner.os }}/node-16/
       - name: Run tests
-        uses: percy/exec-action@v0.3.1
-        with:
-          custom-command: "make test"
+        run: make test
         env:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
