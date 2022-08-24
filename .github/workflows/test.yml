@@ -10,7 +10,7 @@ jobs:
   skipci:
     runs-on: ubuntu-18.04
     steps:
-      - run: echo "[percy] ${{ contains(github.event.head_commit.message, '[percy]') }} - ${{ github.event.commit }}"
+      - run: echo "${{ contains(github.event.head_commit.message, '[percy]') }} - ${{ github.event.commit }}"
   build:
     runs-on: ubuntu-latest
     if: ${{ contains(github.event.head_commit.message, '[percy]') }}
