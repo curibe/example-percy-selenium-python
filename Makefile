@@ -30,4 +30,4 @@ serve:
 	$(VENV)/python -m http.server 8000
 
 test: install
-	npx percy exec -- $(VENV)/python tests/todo.py
+	$(NPM)/percy exec -- $(VENV)/python tests/todo.py
