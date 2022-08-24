@@ -7,6 +7,10 @@ on:
     branches: ["master"]
 
 jobs:
+  skipci:
+    runs-on: ubuntu-18.04
+    steps:
+      - run: echo "[percy] ${{ contains(github.event.head_commit.message, '[percy]') }}"
   build:
     if: contains(github.event.head_commit.message, '[percy]')
     runs-on: ubuntu-latest
