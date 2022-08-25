@@ -18,13 +18,21 @@ jobs:
 
         # Set environment variables based on the last commit
       - name: Set environment variable "commit-message"
-        run: echo "commit-message=$(git log -1 --pretty=format:'%s')" >> $GITHUB_ENV
+        id: commit_msg
+        run: echo "::set-output name=commitmsg::$(git log -1 --pretty=format:'%s')"
+      
       - name: Display environment variable "commit-message"
-        run: echo "commit-message=${{ env.commit-message }}"
+        run: echo "commit-message=${{ steps.commit_msg.outputs.commitmsg }}"
+    outputs:
+      commit_msg: ${{ steps.commit_msg.outputs.commitmsg }}
+
   build:
     runs-on: ubuntu-latest
-    if: ${{ contains(github.event.head_commit.message, '[percy]') }}
+    needs: skipci
+    
+    if: ${{ contains(needs.skipci.outputs.commit_msg, '[percy]') }}
     steps:
+    
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
