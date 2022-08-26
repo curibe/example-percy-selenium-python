@@ -22,7 +22,7 @@ jobs:
         run: |
           message=$(git log -1 --pretty=format:'%s')
           [[ $message =~ "\[(percy|vrt|visual[-_\s*]test|visual)\]" ]] && echo "${BASH_REMATCH[1]}"
-          if [[ $message =~ "\[(percy|vrt|visual[-_\s*]test|visual)\]"]; then
+          if [[ $message =~ "\[(percy|vrt|visual[-_\s*]test|visual)\]" ]]; then
             echo "::set-output name=match::true"
             echo "$message -> Match is true"
           else
