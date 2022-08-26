@@ -17,20 +17,24 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
 
         # Set environment variables based on the last commit
-      - name: Set environment variable "commit-message"
-        id: commit_msg
-        run: echo "::set-output name=commitmsg::$(git log -1 --pretty=format:'%s')"
-      
-      - name: Display environment variable "commit-message"
-        run: echo "commit-message=${{ steps.commit_msg.outputs.commitmsg }}"
+      - name: Check if message contain keywords as scope to do visual test
+        id: check_commit
+        run: |
+          message=$(git log -1 --pretty=format:'%s')
+          if [[ $message =~ "\[(percy|vrt|visual[-_\s*]test|visual)\]" ]]; then
+            echo "::set-output name=match::true"
+            echo "$message -> Match is true"
+          else
+            echo "$message -> Match is false"
+          fi
     outputs:
-      commit_msg: ${{ steps.commit_msg.outputs.commitmsg }}
+      match: ${{ steps.check_commit.outputs.match }}
 
   build:
     runs-on: ubuntu-latest
     needs: skipci
     
-    if: ${{ contains(needs.skipci.outputs.commit_msg, '[percy]') }}
+    if: steps.check_commit.outputs.match == 'true'
     steps:
     
       - uses: actions/checkout@v3
