@@ -9,7 +9,7 @@ on:
 jobs:
 
   skipci:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       # Checkout that works with "push" and "pull_request" trigger event
       - uses: actions/checkout@v2
