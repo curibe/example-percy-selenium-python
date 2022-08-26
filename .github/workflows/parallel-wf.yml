@@ -1,0 +1,15 @@
+name: Basic info
+on: 
+  push:
+    branches: ["master"]
+  
+  pull_request:
+    branches: ["master"]
+
+jobs:
+
+  showinfo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: show message 
+        run: echo "show message ... HELLOO"

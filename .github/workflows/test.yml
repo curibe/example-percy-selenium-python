@@ -1,16 +1,50 @@
 name: Tests
-on: [push, pull_request]
+on: 
+  push:
+    branches: ["master"]
+  
+  pull_request:
+    branches: ["master"]
+
 jobs:
-  build:
+
+  skipci:
     runs-on: ubuntu-latest
     steps:
+      # Checkout that works with "push" and "pull_request" trigger event
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+        # Set environment variables based on the last commit
+      - name: Check if message contain keywords as scope to do visual test
+        id: check_commit
+        run: |
+          message=$(git log -1 --pretty=format:'%s')
+          re="\[(percy|vrt|visual[-_ ]?test|visual)\]"
+          if [[ $message =~ $re ]]; then
+            echo "::set-output name=match::true"
+            echo "$message -> Match is true"
+          else
+            echo "$message -> Match is false"
+          fi
+    outputs:
+      match: ${{ steps.check_commit.outputs.match }}
+
+  build:
+    runs-on: ubuntu-latest
+    needs: skipci
+    
+    if: ${{ needs.skipci.outputs.match == 'true' }}
+    steps:
+    
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: 3.x
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
-          node-version: 12
+          node-version: 16
       - uses: actions/cache@v2
         with:
           path: ~/.cache/pip
@@ -20,10 +54,8 @@ jobs:
         with:
           path: ~/.npm
           key: v1/${{ runner.os }}/node-12/${{ hashFiles('**/package-lock.lock') }}
-          restore-keys: v1/${{ runner.os }}/node-12/
+          restore-keys: v1/${{ runner.os }}/node-16/
       - name: Run tests
-        uses: percy/exec-action@v0.3.1
-        with:
-          custom-command: "make test"
+        run: make test
         env:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
