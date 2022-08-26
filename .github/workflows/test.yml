@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: skipci
     
-    if: ${{ steps.check_commit.outputs.match == 'true' }}
+    if: ${{ needs.skipci.outputs.match == 'true' }}
     steps:
     
       - uses: actions/checkout@v3
